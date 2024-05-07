@@ -1,10 +1,12 @@
+import React from 'react';
 import LoginAccount from "@/components/login-form";
-export default function Home() {
-  return (
-    <>
+
+const Page = () => {
+    return (
         <div className={'h-screen flex justify-center items-center'}>
-             <LoginAccount/>
+            <LoginAccount/>
         </div>
-    </>
-  );
-}
+    );
+};
+
+export default Page;
