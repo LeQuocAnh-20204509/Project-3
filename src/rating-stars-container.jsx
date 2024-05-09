@@ -11,7 +11,6 @@ const RatingStar = function(props) {
 
     function clickHandler(event) {
         props.onClick(props.index);
-        console.log("clicked");
     }
 
     var element = props.isSelected ?
@@ -70,15 +69,21 @@ class RatingStarsContainer extends Component {
     }
 
     setToSelected(index) {
-        var newIsSelected = [...this.state.isSelected];
-        newIsSelected.forEach((e, i, arr) => {
-            if (i <= index) arr[i] = true;
-            else arr[i] = false;
-        });
-        this.setState({
-            isSelected: newIsSelected,
-            isActive: newIsSelected
-        })
+        if (!this.props.isImageUploaded) {
+            alert("Bạn chưa upload ảnh!");
+        } else if (!this.props.isTypingFinished) {
+            alert("Bạn không thể đánh giá vì câu hỏi chưa được sinh ra!");
+        } else {
+            var newIsSelected = [...this.state.isSelected];
+            newIsSelected.forEach((e, i, arr) => {
+                if (i <= index) arr[i] = true;
+                else arr[i] = false;
+            });
+            this.setState({
+                isSelected: newIsSelected,
+                isActive: newIsSelected
+            })
+        }
     }
 
     render() {

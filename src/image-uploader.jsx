@@ -2,9 +2,6 @@ import { Component } from "react";
 import "./image-uploader.css";
 
 class ImageUploader extends Component {
-    containerMaxWidth = 0;
-    containerMaxHeight = 450;
-
     constructor(props) {
         super(props);
         this.state = {
@@ -20,13 +17,6 @@ class ImageUploader extends Component {
         this.onDragOver = this.onDragOver.bind(this);
         this.onDragLeave = this.onDragLeave.bind(this);
         this.onDrop = this.onDrop.bind(this);
-        this.resizeImgContainer = this.resizeImgContainer.bind(this);
-    }
-
-    componentDidMount() {
-        if (this.containerMaxWidth === 0) {
-            this.containerMaxWidth = document.querySelector("#image-upload-container").offsetWidth;
-        }
     }
 
     readAndUpdateImg(file) {
@@ -35,18 +25,14 @@ class ImageUploader extends Component {
         reader.onload = (event) => {
             this.setState({
                 imgSrc: event.target.result
-            },
-            () => {
-                    console.log(this.state.imgSrc);
-                    this.resizeImgContainer();
-                }
-            );
+            });
         }
     }
 
     readFile(event) {
         const fileInput = document.querySelector("#fileInput");
         fileInput.click();
+        this.props.setIsImageChanged(false);
         fileInput.onchange = () => {
             const files = fileInput.files;
             if (files && files[0]) {
@@ -54,6 +40,8 @@ class ImageUploader extends Component {
                     isImageUploaded: true,
                     containerDivBorderStyle: "solid"
                 });
+                this.props.setIsImageUploaded(true);
+                this.props.setIsImageChanged(true);
                 this.readAndUpdateImg(files[0]);
             }
         }
@@ -68,6 +56,7 @@ class ImageUploader extends Component {
     }
 
     onDragLeave(event) {
+        event.preventDefault();
         this.setState({
             isImageDragOver: false,
             containerDivBorderStyle: "dashed"
@@ -77,49 +66,29 @@ class ImageUploader extends Component {
     onDrop(event) {
         event.preventDefault();
         const fileInput = document.querySelector("#fileInput");
-        fileInput.files = event.dataTransfer.files;
-        const file = event.dataTransfer.files[0];
-        const fileType = file.type;
-        const validType = ["image/png", "image/jpg", "image/jpeg"];
-        if (validType.includes(fileType)) {
-            this.setState({
-                isImageUploaded: true
-            });
-            this.readAndUpdateImg(file);
+        if (fileInput.files[0] !== event.dataTransfer.files[0]) {       // kiem tra xem co thay doi hinh anh hay ko
+            fileInput.files = event.dataTransfer.files;
+            const file = event.dataTransfer.files[0];
+            const fileType = file.type;
+            const validType = ["image/png", "image/jpg", "image/jpeg"];
+            if (validType.includes(fileType)) {
+                this.setState({
+                    isImageUploaded: true
+                });
+                this.props.setIsImageUploaded(true);
+                this.props.setIsImageChanged(true);
+                this.readAndUpdateImg(file);
+            } else {
+                this.setState({
+                    isImageDragOver: false,
+                    containerDivBorderStyle: "dashed"
+                });
+                this.props.setIsImageChanged(false);
+                alert("Không đúng định dạng hình ảnh!");
+            }
         } else {
-            this.setState({
-                isImageDragOver: false,
-                containerDivBorderStyle: "dashed"
-            });
-            alert("Không đúng định dạng hình ảnh!");
-        }
-    }
-
-    resizeImgContainer() {
-        var img = new Image();
-        img.src = this.state.imgSrc;
-        var imgWidth = img.width,
-            imgHeight = img.height,
-            imgRatio = imgWidth * 1.0 / imgHeight;
-
-        console.log(imgWidth + " and " + imgHeight);
-        if (imgWidth >= imgHeight) {
-            // imgWidth = 0.92 * containerMaxWidth;
-            // if (containerMaxHeight >= (imgWidth / imgRatio)) {
-            //     imgHeight = imgWidth / imgRatio;
-            // } else {
-                imgHeight = 0.92 * this.containerMaxHeight;
-                imgWidth = imgHeight * imgRatio;
-            // }
-        } else {
-            imgHeight = 0.92 * this.containerMaxHeight;
-            imgWidth = imgHeight * imgRatio;
-        }
-        
-        this.setState({
-            imgWidth: imgWidth,
-            imgHeight: imgHeight
-        });
+            this.props.setIsImageChanged(false);
+        };
     }
 
     render() {
@@ -158,8 +127,6 @@ class ImageUploader extends Component {
 
         var img = <img src={this.state.imgSrc} alt="Uploaded Image"
                         style={{
-                            // width: this.state.imgWidth,
-                            // height: this.state.imgHeight,
                             borderRadius: "20px",
                             maxHeight: 430,
                             maxWidth: "100%"
