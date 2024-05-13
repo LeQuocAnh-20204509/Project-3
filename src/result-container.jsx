@@ -3,6 +3,7 @@ import "./result-container.css";
 import ImageUploader from "./image-uploader";
 import RatingStarsContainer from "./rating-stars-container";
 import { TypeAnimation } from "react-type-animation";
+import { Link, useNavigate } from "react-router-dom";
 
 class GenerateButton extends Component {
     constructor(props) {
@@ -17,7 +18,7 @@ class GenerateButton extends Component {
     changeBackgroundColor(event) {
         this.setState({
             backgroundColor: "darkblue"
-        }, () => {console.log("test1")});
+        });
     };
 
     changeBackBackgroundColor(event) {
@@ -34,11 +35,12 @@ class GenerateButton extends Component {
                         height: 60,
                         width: 160,
                         color: "white",
-                        backgroundColor: "cornflowerblue",
+                        backgroundColor: this.state.backgroundColor,
                         fontSize: "large",
                         fontWeight: "500",
                         margin: "0 auto",
                         border: "none",
+                        borderRadius: "8px",
                         cursor: "pointer"
                     }}
             >
@@ -57,40 +59,92 @@ class ResultContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            canGenerate: false,
+            canType: false,
+            isImageUploaded: false,
+            isImageChanged: false,
             question_arr: [],
-            isGeneratingFinished: false
+            isGenerating: false,
+            isTypingFinished: false
         };
         this.generateQuestion = this.generateQuestion.bind(this);
+        this.setIsImageUploaded = this.setIsImageUploaded.bind(this);
+        this.setIsImageChanged = this.setIsImageChanged.bind(this);
     }
 
     generateQuestion(event) {
-        this.setState({
-            canGenerate: true,
-            question_arr: "Example question: The book is:\nA. Toan 2\nB. Tieng Viet 2\nC. Tieng Anh 2\nD. Luyen viet 2"
-        }, () => {console.log("test1")});
+        if (!this.state.isImageUploaded) {
+            alert("Bạn chưa upload ảnh!");
+        } else if (!this.state.isImageChanged) {
+            alert("Ảnh chưa được thay đổi!");
+        } else {
+            this.setState({
+                canType: false,
+                isGenerating: true,
+                isTypingFinished: false
+            });
+            var questionContainer = document.querySelector("#question_container");
+            setTimeout(() => {
+                var randomIndex = Math.floor(Math.random() * 10);
+                this.setState({
+                    canType: true,
+                    isGenerating: false,
+                    question_arr: "Example question, this is a random question: The book is: " + randomIndex + ":\nA. Toan " + randomIndex 
+                                    + "\nB. Tieng Viet " + randomIndex + "\nC. Tieng Anh " + randomIndex 
+                                    + "\nD. Luyen viet " + randomIndex
+                }, () => {
+                    questionContainer.scrollIntoView();
+                    this.setState({
+                        isImageChanged: false
+                    })
+                });
+            }, 2000);
+        }
+
     }
 
-    setIsFinishedGenerating() {
+    setIsImageUploaded(isUploaded) {
         this.setState({
-            isGeneratingFinished: true
+            isImageUploaded: isUploaded
         })
+    }
+
+    setIsImageChanged(isChanged) {
+        this.setState({
+            isImageChanged: isChanged
+        });
     }
 
     render() {
         return (
-            <>
+            <div
+                style={{
+                    borderBottom: "1px solid gray"
+                }}
+            >
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "60% 25%",
+                        gridTemplateColumns: "60% 9% 20%",
                         alignItems: "center",
                         justifyItems: "center",
                         width: "100%"
                     }}
                 >
-                    <ImageUploader />
-                    <GenerateButton onClick={this.generateQuestion}/>
+                    <ImageUploader setIsImageUploaded={this.setIsImageUploaded} setIsImageChanged={this.setIsImageChanged} />
+                    {
+                        this.state.isGenerating ?
+                        <div>
+                            <i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                            <div
+                                style={{
+                                    marginTop: "15px",
+                                    fontWeight: "500"
+                                }}
+                            >Đang xử lý...</div>
+                        </div> :
+                        <div></div>
+                    }
+                    <GenerateButton onClick={this.generateQuestion} />
                 </div>
                 <div
                     style={{
@@ -101,7 +155,7 @@ class ResultContainer extends Component {
                         alignItems: "center"
                     }}
                 >
-                    <div
+                    <div id="question_container"
                         style={{
                             // width: "80%",
                             height: 300,
@@ -112,9 +166,16 @@ class ResultContainer extends Component {
                         <b>Câu hỏi:</b>
                         <div>
                             {
-                                this.state.canGenerate ?
+                                (this.state.canType) ?
                                 <TypeAnimation 
-                                    sequence={[this.state.question_arr, 1000]}
+                                    sequence={[
+                                        this.state.question_arr,
+                                        () => {
+                                            this.setState({
+                                                isTypingFinished: true
+                                            })
+                                        }
+                                    ]}
                                     speed={160}
                                     style={{
                                         whiteSpace: "pre-line",
@@ -130,7 +191,8 @@ class ResultContainer extends Component {
                     <div
                         style={{
                             padding: "5%",
-                            fontSize: "1.1rem"
+                            fontSize: "1.1rem",
+                            color: this.state.isTypingFinished && this.state.isImageUploaded ? "black" : "GrayText"
                         }}
                     >
                         <div>
@@ -142,7 +204,9 @@ class ResultContainer extends Component {
                                     cursor: "pointer"
                                 }}
                             >
-                                <RatingStarsContainer />
+                                <RatingStarsContainer isImageUploaded={this.state.isImageUploaded} 
+                                                    isTypingFinished={this.state.isTypingFinished} 
+                                />
                             </div>
                         </div>
                         <div
@@ -154,7 +218,7 @@ class ResultContainer extends Component {
                             <i className="fa fa-share fa-fw" aria-hidden></i>
                             &nbsp;Chia sẻ
                         </div>
-                        <div
+                        <Link to={"/login"}
                             style={{
                                 fontSize: "1em",
                                 cursor: "pointer"
@@ -162,10 +226,10 @@ class ResultContainer extends Component {
                         >
                             <i className="fa fa-user fa-fw" aria-hidden></i>
                             &nbsp;Đăng nhập để bình luận
-                        </div>
+                        </Link>
                     </div>
                 </div>
-            </>
+            </div>
         )
     }
 }
