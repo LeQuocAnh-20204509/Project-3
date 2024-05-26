@@ -1,10 +1,10 @@
 import React from 'react';
-import SignUpAccount from "@/components/signup-form";
+import {SignupForm} from "@/components/signup-form";
 
 const Page = () => {
     return (
         <div className={'h-screen flex justify-center items-center'}>
-            <SignUpAccount/>
+            <SignupForm/>
         </div>
     );
 };

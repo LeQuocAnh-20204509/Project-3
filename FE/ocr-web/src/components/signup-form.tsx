@@ -1,64 +1,68 @@
-
 "use client"
+import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link";
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {useFormState, useFormStatus} from "react-dom";
+import {signUp} from "@/app/lib/actions";
 
-export default function SignUpAccount() {
+function SubmitButton() {
+    const {pending} = useFormStatus();
+    return <Button type="submit" className="w-full" disabled={pending}>
+        Create an account
+    </Button>;
+}
+
+export function SignupForm() {
+    const [errorMessage, dispatch] = useFormState(signUp, undefined)
+
     return (
-        <div className="relative flex flex-col justify-center items-center min-h-screen overflow-hidden">
-            <div className="w-full m-auto bg-white lg:max-w-lg">
-                <Card>
-                    <CardHeader className="space-y-1">
-                        <CardTitle className="text-2xl text-center">Sign up</CardTitle>
-                        <CardDescription className="text-center">
-                            Create an account with your email and password
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-4">
+        <form action={dispatch}>
+            <Card className="mx-auto max-w-sm">
+                <CardHeader>
+                    <CardTitle className="text-xl">Sign Up</CardTitle>
+                    <CardDescription>
+                        Enter your information to create an account
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" placeholder=""/>
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="m@example.com"
+                                required
+                                name="email"
+                            />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="username">Username</Label>
-                            <Input id="username" type="text" placeholder=""/>
+                            <Input id="username" type="username" name="username"/>
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password">Password</Label>
-                            <Input id="password" type="password"/>
+                            <Input id="password" type="password" name="password"/>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="terms"/>
-                            <label
-                                htmlFor="terms"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                                Remember me
-                            </label>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="flex flex-col">
-                        <Button className="w-full">Sign up</Button>
-                        <p className="mt-2 text-xs text-center text-gray-700">
-                        {" "}
-                            Have an account?{" "}
-                            <Link href={'/login'}><span className=" text-blue-600 hover:underline">Log in</span></Link>
-                        </p>
-                    </CardFooter>
-                </Card>
-            </div>
-        </div>
+                        <SubmitButton/>
+                    </div>
+                    <div className="mt-4 text-center text-sm">
+                        Already have an account?{" "}
+                        <Link href="#" className="underline">
+                            Sign in
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
+        </form>
     )
 }

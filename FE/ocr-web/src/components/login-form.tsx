@@ -1,76 +1,79 @@
+'use client'
 
-"use client"
-
-import { Button } from "@/components/ui/button"
+import {authenticate} from '@/app/lib/actions'
+import {useFormState, useFormStatus} from 'react-dom'
+import {Button} from "@/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
 import Link from "next/link";
-import {signIn} from "@/auth";
 
-export default function LoginAccount() {
-    const handleSubmit = async (formData: any) => {
-        try {
-            const user = await signIn("credentials",formData);
-            // Do something with the user, perhaps redirect or update state
-        } catch (error) {
-            // Handle errors, perhaps show an error message to the user
-            console.log(error)
-        }
-    };
+export default function Page() {
+    const [errorMessage, dispatch] = useFormState(authenticate, undefined)
+
     return (
-        <div className="relative flex flex-col justify-center items-center min-h-screen overflow-hidden">
-            <div className="w-full m-auto bg-white lg:max-w-lg">
 
-                <Card>
-                    <form
-                        action={handleSubmit}
-                    >
-                        <CardHeader className="space-y-1">
-                            <CardTitle className="text-2xl text-center">Sign in</CardTitle>
-                            <CardDescription className="text-center">
-                                Enter your username and password to login
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="grid gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input id="username" type="text" placeholder=""/>
-                            </div>
-                            <div className="grid gap-2">
+        <Card className="mx-auto max-w-sm">
+            <CardHeader>
+                <CardTitle className="text-2xl">Login</CardTitle>
+                <CardDescription>
+                    Enter your username below to login to your account
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form action={dispatch}>
+                    <div className="grid gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="username">Username</Label>
+                            <Input
+                                id="username"
+                                name={'username'}
+                                type="text"
+                                required
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <div className="flex items-center">
                                 <Label htmlFor="password">Password</Label>
-                                <Input id="password" type="password"/>
+                                <Link href="#" className="ml-auto inline-block text-sm underline">
+                                    Forgot your password?
+                                </Link>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="terms"/>
-                                <label
-                                    htmlFor="terms"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Remember me
-                                </label>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex flex-col">
-                            <Button className="w-full">Login</Button>
-                            <p className="mt-2 text-xs text-center text-gray-700">
-                                {" "}
-                                Don't have an account?{" "}
-                                <Link href={'/register'}><span className=" text-blue-600 hover:underline">Sign up</span></Link>
-                            </p>
-                        </CardFooter>
-                    </form>
+                            <Input id="password" type="password" required name={'password'}/>
+                        </div>
+                        <LoginButton/>
+                    </div>
+                </form>
 
-                </Card>
-            </div>
-        </div>
+                <div className="mt-4 text-center text-sm">
+                    Don&apos;t have an account?{" "}
+                    <Link href="#" className="underline">
+                        Sign up
+                    </Link>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+function LoginButton() {
+    const {pending} = useFormStatus()
+
+    const handleClick = (event: any) => {
+        if (pending) {
+            event.preventDefault()
+        }
+    }
+
+    return (
+        <Button aria-disabled={pending} type="submit" onClick={handleClick} className="w-full">
+            Login
+        </Button>
     )
 }
