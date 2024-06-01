@@ -53,11 +53,14 @@ export function SignupForm() {
                             <Label htmlFor="password">Password</Label>
                             <Input id="password" type="password" name="password"/>
                         </div>
+                        {errorMessage && (
+                            <div className="text-destructive text-sm bg-red-100">{errorMessage}</div>
+                        )}
                         <SubmitButton/>
                     </div>
                     <div className="mt-4 text-center text-sm">
                         Already have an account?{" "}
-                        <Link href="#" className="underline">
+                        <Link href="/login" className="underline">
                             Sign in
                         </Link>
                     </div>

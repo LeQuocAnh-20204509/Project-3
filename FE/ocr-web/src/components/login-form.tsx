@@ -1,6 +1,6 @@
 'use client'
 
-import {authenticate} from '@/app/lib/actions'
+import {logIn} from '@/app/lib/actions'
 import {useFormState, useFormStatus} from 'react-dom'
 import {Button} from "@/components/ui/button"
 import {
@@ -15,7 +15,7 @@ import {Label} from "@/components/ui/label"
 import Link from "next/link";
 
 export default function Page() {
-    const [errorMessage, dispatch] = useFormState(authenticate, undefined)
+    const [errorMessage, dispatch] = useFormState(logIn, undefined)
 
     return (
 
@@ -47,13 +47,16 @@ export default function Page() {
                             </div>
                             <Input id="password" type="password" required name={'password'}/>
                         </div>
+                        {errorMessage && (
+                            <div className="text-destructive text-sm bg-red-100">{errorMessage}</div>
+                        )}
                         <LoginButton/>
                     </div>
                 </form>
 
                 <div className="mt-4 text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <Link href="#" className="underline">
+                    <Link href="/signup" className="underline">
                         Sign up
                     </Link>
                 </div>
