@@ -2,6 +2,9 @@ import { Component } from "react";
 import "./App.css";
 import ResultContainer from "./result-container";
 import CommentsContainer from "./comments-container";
+import Navbar from "./navbar";
+import Footer from "./footer";
+import Header from "./header";
 
 class App extends Component {
   constructor(props) {
@@ -11,30 +14,22 @@ class App extends Component {
   render() {
     return (
       <>
-        <header>
-          OCR<br/>
-          Hệ thống sinh câu hỏi trắc nghiệm từ hình ảnh
-        </header>
+        <Header />
+        <Navbar />
 
-        <div id="body">
-          <div id="container">
-            <aside>Phần aside left</aside>
-            <div id="main">
-              <video controls autoPlay>
-                <source type="video/youtube" src="https://www.youtube.com/watch?v=boO4QDHnn_w"/>
-              </video>
-              <ResultContainer />
-              <CommentsContainer />
-            </div>
-            <aside>
-              Phần aside right
-            </aside>
+        <div id="container">
+          <aside></aside>
+          <div id="main">
+            <video controls autoPlay>
+              <source type="video/youtube" src="https://www.youtube.com/watch?v=boO4QDHnn_w"/>
+            </video>
+            <ResultContainer />
+            <CommentsContainer />
           </div>
+          <aside></aside>
         </div>
 
-        <footer>
-          Phần footer
-        </footer>
+        <Footer />
       </>
     )
   }

@@ -1,9 +1,15 @@
 import { Component } from "react";
-import "./result-container.css";
 import ImageUploader from "./image-uploader";
 import RatingStarsContainer from "./rating-stars-container";
 import { TypeAnimation } from "react-type-animation";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { setUploadedOrNot, setChangedOrNot, setContainerBorderStyle } from "./react-redux/image-upload-slice";
+import { setActiveOrNot } from "./react-redux/rate-share-comment-slice";
+import { setIsGeneratingOrNot, setCanTypeOrNot, setQuestion } from "./react-redux/question-generating-slice";
+import { connect } from "react-redux";
+import { setActive } from "./react-redux/navbar-slice";
+
+const axios = require("axios");
 
 class GenerateButton extends Component {
     constructor(props) {
@@ -32,13 +38,14 @@ class GenerateButton extends Component {
             <button id="generate-button" onClick={this.props.onClick} onMouseEnter={this.changeBackgroundColor} 
                     onMouseLeave={this.changeBackBackgroundColor}
                     style={{
-                        height: 60,
-                        width: 160,
+                        height: "fit-content",
+                        width: "fit-content",
                         color: "white",
                         backgroundColor: this.state.backgroundColor,
-                        fontSize: "large",
+                        fontSize: "1.4rem",
                         fontWeight: "500",
                         margin: "0 auto",
+                        padding: "10%",
                         border: "none",
                         borderRadius: "8px",
                         cursor: "pointer"
@@ -59,59 +66,59 @@ class ResultContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            canType: false,
-            isImageUploaded: false,
-            isImageChanged: false,
-            question_arr: [],
-            isGenerating: false,
-            isTypingFinished: false
+            question: ""
         };
         this.generateQuestion = this.generateQuestion.bind(this);
-        this.setIsImageUploaded = this.setIsImageUploaded.bind(this);
-        this.setIsImageChanged = this.setIsImageChanged.bind(this);
     }
 
     generateQuestion(event) {
-        if (!this.state.isImageUploaded) {
+        if (!this.props.isImageUploaded) {
             alert("Bạn chưa upload ảnh!");
-        } else if (!this.state.isImageChanged) {
+        } else if (!this.props.isImageChanged) {
             alert("Ảnh chưa được thay đổi!");
         } else {
-            this.setState({
-                canType: false,
-                isGenerating: true,
-                isTypingFinished: false
-            });
+            this.props.submitContainerBorderStyle(true);
+            this.props.submitGeneratingOrNot(true);
+            console.log(this.props.canType);
             var questionContainer = document.querySelector("#question_container");
             setTimeout(() => {
                 var randomIndex = Math.floor(Math.random() * 10);
+                this.props.submitGeneratingOrNot(false);
+                var generatedQuestion = "Example question, this is a random question: The book is: " + "\nA. Toan " + randomIndex 
+                                        + "\nB. Tieng Viet " + randomIndex + "\nC. Tieng Anh " + randomIndex 
+                                        + "\nD. Luyen viet " + randomIndex;
                 this.setState({
-                    canType: true,
-                    isGenerating: false,
-                    question_arr: "Example question, this is a random question: The book is: " + randomIndex + ":\nA. Toan " + randomIndex 
-                                    + "\nB. Tieng Viet " + randomIndex + "\nC. Tieng Anh " + randomIndex 
-                                    + "\nD. Luyen viet " + randomIndex
+                    question: generatedQuestion
                 }, () => {
-                    questionContainer.scrollIntoView();
-                    this.setState({
-                        isImageChanged: false
-                    })
+                    this.props.submitCanTypeOrNot(true);
                 });
+                this.props.submitQuestion(generatedQuestion.split("\n"));
+                questionContainer.scrollIntoView();
+                this.props.submitChangedOrNot(false);
             }, 2000);
+            // axios.post("http://localhost:8000/api/submissions", {
+            //     FILES: [imgSrc]
+            // }).then((response1) => {
+            //     console.log(response1);
+            //     axios.post(
+            //         "http://localhost:8000/api/file/" + response1.data.file_ids + "/generate"
+            //     ).then((response2) => {
+            //         console.log(response2);
+            //     }).catch((error2) => {
+            //         console.log(error2);
+            //     })
+            // }).catch((error) => {
+            //     console.log(error);
+            // });
         }
 
     }
 
-    setIsImageUploaded(isUploaded) {
-        this.setState({
-            isImageUploaded: isUploaded
-        })
-    }
-
-    setIsImageChanged(isChanged) {
-        this.setState({
-            isImageChanged: isChanged
+    processGeneratedQuestion(generatedQuestion) {
+        var mappedDivQuestion = generatedQuestion.map((value, index, array) => {
+            return <div key={value}>{value}</div>;
         });
+        return mappedDivQuestion;
     }
 
     render() {
@@ -124,20 +131,31 @@ class ResultContainer extends Component {
                 <div
                     style={{
                         display: "grid",
-                        gridTemplateColumns: "60% 9% 20%",
+                        gridTemplateColumns: "60% 11% 20%",
                         alignItems: "center",
                         justifyItems: "center",
                         width: "100%"
                     }}
                 >
-                    <ImageUploader setIsImageUploaded={this.setIsImageUploaded} setIsImageChanged={this.setIsImageChanged} />
+                    <ImageUploader />
                     {
-                        this.state.isGenerating ?
-                        <div>
-                            <i className="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+                        this.props.isGenerating ?
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center"
+                            }}
+                        >
+                            <i className="fa fa-spinner fa-pulse fa-3x fa-fw"
+                                style={{
+                                    margin: "0 auto"
+                                }}
+                            ></i>
                             <div
                                 style={{
                                     marginTop: "15px",
+                                    fontSize: "1.2rem",
                                     fontWeight: "500"
                                 }}
                             >Đang xử lý...</div>
@@ -159,31 +177,33 @@ class ResultContainer extends Component {
                         style={{
                             // width: "80%",
                             height: 300,
-                            border: "1px solid gray",
-                            padding: "10%"
+                            fontSize: "1.1rem",
+                            padding: "10%",
+                            boxShadow: "5px 0 15px rgba(0, 0, 0, 0.2), -5px 0 15px rgba(0, 0, 0, 0.2)"
                         }}
                     >
                         <b>Câu hỏi:</b>
                         <div>
                             {
-                                (this.state.canType) ?
-                                <TypeAnimation 
-                                    sequence={[
-                                        this.state.question_arr,
-                                        () => {
-                                            this.setState({
-                                                isTypingFinished: true
-                                            })
-                                        }
-                                    ]}
-                                    speed={160}
-                                    style={{
-                                        whiteSpace: "pre-line",
-                                    }}
-                                    cursor={false}
-                                    omitDeletionAnimation
-                                    
-                                /> : ""
+                                this.props.isFunctionalitiesActive ?            // neu da sinh cau hoi roi thi hien thi luon, su dung isFunctionalitiesActive vi khi da sinh cau hoi ra xong thi cung la luc active
+                                this.processGeneratedQuestion(this.props.generatedQuestion) :
+                                ((this.props.canType) ?
+                                    <TypeAnimation 
+                                        sequence={[
+                                            this.state.question,
+                                            () => {
+                                                this.props.submitFunctionalitiesActiveOrNot(true);
+                                                console.log("test: " + this.state.question);
+                                            }
+                                        ]}
+                                        speed={160}
+                                        style={{
+                                            whiteSpace: "pre-line",
+                                        }}
+                                        cursor={false}
+                                        omitDeletionAnimation
+                                    /> : ""
+                                )
                             }
                         </div>
                     </div>
@@ -191,12 +211,21 @@ class ResultContainer extends Component {
                     <div
                         style={{
                             padding: "5%",
-                            fontSize: "1.1rem",
-                            color: this.state.isTypingFinished && this.state.isImageUploaded ? "black" : "GrayText"
+                            fontSize: "1.15rem",
+                            color: this.props.isFunctionalitiesActive ? "black" : "GrayText"
                         }}
                     >
                         <div>
-                            <i className="fa fa-thumbs-o-up fa-fw" aria-hidden></i>
+                            {
+                                this.props.isFunctionalitiesActive ?
+                                <img src={require("./images/like-icon.png")} className="fa fa-fw"
+                                    style={{
+                                        width: "22px",
+                                        marginRight: "8px",
+                                    }}
+                                /> :
+                                <i className="fa fa-thumbs-o-up fa-lg fa-fw" aria-hidden></i>
+                            }                            
                             &nbsp;Bạn đánh giá thế nào về câu hỏi được sinh ra này ?&nbsp;&nbsp;
                             <div
                                 style={{
@@ -204,9 +233,7 @@ class ResultContainer extends Component {
                                     cursor: "pointer"
                                 }}
                             >
-                                <RatingStarsContainer isImageUploaded={this.state.isImageUploaded} 
-                                                    isTypingFinished={this.state.isTypingFinished} 
-                                />
+                                <RatingStarsContainer />
                             </div>
                         </div>
                         <div
@@ -215,16 +242,25 @@ class ResultContainer extends Component {
                                 cursor: "pointer"
                             }}
                         >
-                            <i className="fa fa-share fa-fw" aria-hidden></i>
+                            <i className="fa fa-share fa-lg fa-fw" aria-hidden
+                                style={{
+                                    color: this.props.isFunctionalitiesActive ? "Highlight" : "GrayText"
+                                }}
+                            ></i>
                             &nbsp;Chia sẻ
                         </div>
                         <Link to={"/login"}
+                            onClick={this.props.submitAccountActive}
                             style={{
                                 fontSize: "1em",
                                 cursor: "pointer"
                             }}
                         >
-                            <i className="fa fa-user fa-fw" aria-hidden></i>
+                            <i className="fa fa-user fa-lg fa-fw" aria-hidden
+                                style={{
+                                    color: this.props.isFunctionalitiesActive ? "#4b4b4b" : "GrayText"
+                                }}
+                            ></i>
                             &nbsp;Đăng nhập để bình luận
                         </Link>
                     </div>
@@ -234,4 +270,62 @@ class ResultContainer extends Component {
     }
 }
 
-export default ResultContainer;
+const mapStateToProps = (state) => {
+    return {
+        isImageUploaded: state.imageUpload.isUploaded,
+        isImageChanged: state.imageUpload.isChanged,
+        isGenerating: state.questionGenerating.isGenerating,
+        canType: state.questionGenerating.canType,
+        generatedQuestion: state.questionGenerating.question,
+        isFunctionalitiesActive: state.rateShareComment.isActive
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitAccountActive: () => {
+            dispatch(setActive({
+                index: 3
+            }))
+        },
+        submitUploadedOrNot: (isUploaded) => {
+            dispatch(setUploadedOrNot({
+                isUploaded: isUploaded
+            }));
+        },
+        submitChangedOrNot: (isChanged) => {
+            dispatch(setChangedOrNot({
+                isChanged: isChanged
+            }));
+        },
+        submitContainerBorderStyle: (isActive) => {
+            dispatch(setContainerBorderStyle({
+                isActive: isActive
+            }))
+        },
+        submitGeneratingOrNot: (isGenerating) => {
+            dispatch(setIsGeneratingOrNot({
+                isGenerating: isGenerating
+            }))
+        },
+        submitCanTypeOrNot: (canType) => {
+            dispatch(setCanTypeOrNot({
+                canType: canType
+            }))
+        },
+        submitQuestion: (question) => {
+            dispatch(setQuestion({
+                question: question
+            }))
+        },
+        submitFunctionalitiesActiveOrNot: (isActive) => {
+            dispatch(setActiveOrNot({
+                isActive: isActive
+            }))
+        },
+    }
+}
+
+const connectedResultContainer = connect(mapStateToProps, mapDispatchToProps)(ResultContainer);
+
+export default connectedResultContainer;
