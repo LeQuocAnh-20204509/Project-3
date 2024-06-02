@@ -3,9 +3,11 @@
 import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
 
+const baseURL = "http://localhost:3000";
+
 export async function logIn(_currentState: unknown, formData: FormData) {
 
-    const res = await fetch("http://localhost:3000/api/login", {
+    const res = await fetch(baseURL + "/api/login", {
         method: 'POST',
         body: formData,
     });
@@ -22,7 +24,7 @@ export async function logIn(_currentState: unknown, formData: FormData) {
 }
 
 export async function signUp(_currentState: unknown, formData: FormData) {
-    const res = await fetch("http://localhost:3000/api/register", {
+    const res = await fetch(baseURL + "/api/register", {
         method: 'POST',
         body: JSON.stringify({
             email: formData.get('email'),

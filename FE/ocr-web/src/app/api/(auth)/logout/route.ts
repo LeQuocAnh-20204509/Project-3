@@ -5,7 +5,6 @@ export async function POST(req: Request) {
     const c = cookies();
     const authorization = cookies().get('auth_token');
     c.delete('auth_token');
-    console.log(authorization?.value);
 
     const myHeaders = new Headers();
     myHeaders.append("Authorization", authorization?.value || '');
