@@ -1,9 +1,17 @@
 import { Component } from "react";
+import Navbar from "./navbar";
+import Footer from "./footer";
+import Header from "./header";
 
 class logInPage extends Component {
     render() {
         return (
-            <h1>Trang đăng nhập</h1>
+            <>
+                <Header />
+                <Navbar />
+                <h1>Trang đăng nhập</h1>
+                <Footer />
+            </>
         )
     }
 }

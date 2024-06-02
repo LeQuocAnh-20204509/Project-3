@@ -7,6 +7,8 @@ import image6 from "./userAvatars/image6.jpg";
 import image7 from "./userAvatars/image7.jpg";
 import image8 from "./userAvatars/image8.jpg";
 import { Link } from "react-router-dom";
+import { setActive } from "./react-redux/navbar-slice";
+import { connect } from "react-redux";
 
 class CommentsContainer extends Component {
     constructor(props) {
@@ -119,7 +121,9 @@ class CommentsContainer extends Component {
                 >&nbsp;&nbsp;&nbsp;Bình luận</h3>
                 {commentDivsArray}
                 <button>
-                    <Link to={"/login"}>
+                    <Link to={"/login"}
+                        onClick={this.props.submitAccountActive}
+                    >
                         <i className="fa fa-user fa-fw" aria-hidden></i>
                         &nbsp;Đăng nhập để bình luận
                     </Link>
@@ -129,4 +133,22 @@ class CommentsContainer extends Component {
     }
 }
 
-export default CommentsContainer;
+const mapStateToProps = (state) => {
+    return {
+
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitAccountActive: () => {
+            dispatch(setActive({
+                index: 3
+            }))
+        }
+    }
+}
+
+const connectedCommentsContainer = connect(mapStateToProps, mapDispatchToProps)(CommentsContainer);
+
+export default connectedCommentsContainer;

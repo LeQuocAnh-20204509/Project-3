@@ -1,4 +1,6 @@
 import { Component } from "react";
+import { setRateHoveredOrNot, setRateSelectedOrNot } from "./react-redux/rate-share-comment-slice";
+import { connect } from "react-redux";
 
 const RatingStar = function(props) {
     function mouseEnterHandler(event) {
@@ -43,8 +45,7 @@ class RatingStarsContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isActive: [false, false, false, false, false, false],
-            isSelected: [false, false, false, false, false, false]
+        
         }
         this.changeToActive = this.changeToActive.bind(this);
         this.changeToUnactive = this.changeToUnactive.bind(this);
@@ -52,60 +53,44 @@ class RatingStarsContainer extends Component {
     };
 
     changeToActive(index) {
-        var newIsActive = [...this.state.isActive];
-        newIsActive.forEach((e, i, arr) => {
-            if (i <= index) arr[i] = true
-        });
-        this.setState({
-            isActive: newIsActive
-        });
+        this.props.submitRateHoveredOrNot(index, true);
     };
 
     changeToUnactive(index) {
-        var newIsActive = [false, false, false, false, false, false];
-        this.setState({
-            isActive: newIsActive
-        });
+        this.props.submitRateHoveredOrNot(index, false);
     }
 
     setToSelected(index) {
         if (!this.props.isImageUploaded) {
             alert("Bạn chưa upload ảnh!");
-        } else if (!this.props.isTypingFinished) {
-            alert("Bạn không thể đánh giá vì câu hỏi chưa được sinh ra!");
+        } else if (!this.props.isFunctionalitiesActive) {
+            alert("Bạn không thể đánh giá vì câu hỏi chưa được sinh ra hoặc đang được sinh ra!");
         } else {
-            var newIsSelected = [...this.state.isSelected];
-            newIsSelected.forEach((e, i, arr) => {
-                if (i <= index) arr[i] = true;
-                else arr[i] = false;
-            });
-            this.setState({
-                isSelected: newIsSelected,
-                isActive: newIsSelected
-            })
+            this.props.submitRateSelectedOrNot(index, true);
+            this.changeToActive(index);
         }
     }
 
     render() {
         return (
             <div>
-                <RatingStar index={1} isActive={this.state.isActive[1]} isSelected={this.state.isSelected[1]}
+                <RatingStar index={0} isActive={this.props.isHovered[0]} isSelected={this.props.isSelected[0]}
                     onMouseEnter={this.changeToActive} onMouseLeave={this.changeToUnactive} onClick={this.setToSelected}
                 />
                 &nbsp;
-                <RatingStar index={2} isActive={this.state.isActive[2]} isSelected={this.state.isSelected[2]}
+                <RatingStar index={1} isActive={this.props.isHovered[1]} isSelected={this.props.isSelected[1]}
                     onMouseEnter={this.changeToActive} onMouseLeave={this.changeToUnactive} onClick={this.setToSelected}
                 />
                 &nbsp;
-                <RatingStar index={3} isActive={this.state.isActive[3]} isSelected={this.state.isSelected[3]}
+                <RatingStar index={2} isActive={this.props.isHovered[2]} isSelected={this.props.isSelected[2]}
                     onMouseEnter={this.changeToActive} onMouseLeave={this.changeToUnactive} onClick={this.setToSelected}
                 />
                 &nbsp;
-                <RatingStar index={4} isActive={this.state.isActive[4]} isSelected={this.state.isSelected[4]}
+                <RatingStar index={3} isActive={this.props.isHovered[3]} isSelected={this.props.isSelected[3]}
                     onMouseEnter={this.changeToActive} onMouseLeave={this.changeToUnactive} onClick={this.setToSelected}
                 />
                 &nbsp;
-                <RatingStar index={5} isActive={this.state.isActive[5]} isSelected={this.state.isSelected[5]}
+                <RatingStar index={4} isActive={this.props.isHovered[4]} isSelected={this.props.isSelected[4]}
                     onMouseEnter={this.changeToActive} onMouseLeave={this.changeToUnactive} onClick={this.setToSelected}
                 />
             </div>
@@ -113,4 +98,32 @@ class RatingStarsContainer extends Component {
     }
 }
 
-export default RatingStarsContainer;
+const mapStateToProps = (state) => {
+    return {
+        isHovered: state.rateShareComment.rate.isHovered,
+        isSelected: state.rateShareComment.rate.isSelected,
+        isImageUploaded: state.imageUpload.isUploaded,
+        isFunctionalitiesActive: state.rateShareComment.isActive
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        submitRateHoveredOrNot: (index, isHovered) => {
+            dispatch(setRateHoveredOrNot({
+                index: index,
+                isHovered: isHovered
+            }))
+        },
+        submitRateSelectedOrNot: (index, isSelected) => {
+            dispatch(setRateSelectedOrNot({
+                index: index,
+                isSelected: isSelected
+            }))
+        }
+    }
+}
+
+const connectedRatingStarsContainer = connect(mapStateToProps, mapDispatchToProps)(RatingStarsContainer);
+
+export default connectedRatingStarsContainer;
