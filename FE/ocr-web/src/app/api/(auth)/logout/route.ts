@@ -1,7 +1,20 @@
-export async function GET(req: Request) {
-    const authorization = req.headers.get('authorization')
-    console.log(authorization);
-    return await fetch('http://localhost:8000/api/logout', {
+import {cookies} from "next/headers";
+import {redirect} from "next/navigation";
+
+export async function POST(req: Request) {
+    const c = cookies();
+    const authorization = cookies().get('auth_token');
+    c.delete('auth_token');
+    console.log(authorization?.value);
+
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", authorization?.value || '');
+
+    await fetch('http://localhost:8000/api/logout', {
         method: 'GET',
+        headers: myHeaders
     });
+
+    redirect('/login');
+
 }

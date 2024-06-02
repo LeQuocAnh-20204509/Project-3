@@ -19,7 +19,7 @@ class Header extends Component {
                 <header
                     onClick={this.changeActive}
                     style={{
-                        height: "100px",
+                        // height: "100px",
                         width: "100%",
                         padding: "30px 0",
                         fontSize: "2rem",
