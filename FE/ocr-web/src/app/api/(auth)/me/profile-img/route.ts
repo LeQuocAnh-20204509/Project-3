@@ -1,7 +1,5 @@
-// /pages/api/profile-img.js
 import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
-import {revalidatePath} from "next/cache";
 
 export async function GET(req: NextRequest) {
     const c = cookies();

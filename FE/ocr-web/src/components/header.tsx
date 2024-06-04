@@ -137,9 +137,11 @@ const Header = () => {
                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem asChild><Link href="/me">Info</Link></DropdownMenuItem>
+                        <DropdownMenuItem asChild><Link href="/me/change-password">Change password</Link></DropdownMenuItem>
+
                         <DropdownMenuItem>Support</DropdownMenuItem>
                         <DropdownMenuSeparator/>
-                        <form action="api/logout" method="post">
+                        <form action="/api/logout" method="post">
                             <DropdownMenuItem asChild>
                                 <button type="submit" className="w-full">Logout</button>
                             </DropdownMenuItem>
