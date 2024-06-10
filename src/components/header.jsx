@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
-import { setActive } from "./react-redux/navbar-slice";
+import { setActive } from "../react-redux/navbar-slice";
 import { connect } from "react-redux";
 
 class Header extends Component {
@@ -35,7 +35,7 @@ class Header extends Component {
                             justifyContent: "center",
                         }}
                     >
-                        <img src={require('./images/ocr-image.png')} alt="ocr-image"
+                        <img src={require('../images/ocr-image.png')} alt="ocr-image"
                             style={{
                                 width: "2.5rem"
                             }}

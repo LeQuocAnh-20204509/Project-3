@@ -14,11 +14,6 @@ html {
   grid-template-columns: 10% 80% 10%;
 }
 
-video {
-  width: 80%;
-  height: 400px;
-}
-
 aside {
   background-color: whitesmoke;
 }

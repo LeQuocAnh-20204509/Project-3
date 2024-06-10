@@ -4,10 +4,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import logInPage from './log-in-page';
+import logInPage from './pages/log-in-page';
 import { Provider } from "react-redux";
 import store from "./react-redux/redux-store";
-import UserProfile from './user-profile';
+import UserProfile from './pages/user-profile';
+import SharePage from './pages/share-page';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/user-profile",
     Component: UserProfile
+  },
+  {
+    path: "/share",
+    Component: SharePage
   }
 ])
 

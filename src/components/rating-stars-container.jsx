@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { setRateHoveredOrNot, setRateSelectedOrNot } from "./react-redux/rate-share-comment-slice";
+import { setRateHoveredOrNot, setRateSelectedOrNot } from "../react-redux/rate-share-comment-slice";
 import { connect } from "react-redux";
 
 const RatingStar = function(props) {

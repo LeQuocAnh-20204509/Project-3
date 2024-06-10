@@ -1,7 +1,7 @@
 import { Component } from "react";
-import Navbar from "./navbar";
-import Footer from "./footer";
-import Header from "./header";
+import Navbar from "../components/navbar";
+import Footer from "../components/footer";
+import Header from "../components/header";
 
 class logInPage extends Component {
     render() {

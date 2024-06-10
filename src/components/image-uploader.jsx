@@ -1,9 +1,9 @@
 import { Component } from "react";
-import { setUploadedOrNot, setChangedOrNot, setImageSource, setContainerBorderStyle } from "./react-redux/image-upload-slice.js";
+import { setUploadedOrNot, setChangedOrNot, setImageSource, setContainerBorderStyle, setImageFile } from "../react-redux/image-upload-slice.js";
 import { connect } from "react-redux";
 import axios from "axios";
-import { setActiveOrNot, setRateHoveredOrNot, setRateSelectedOrNot } from "./react-redux/rate-share-comment-slice.js";
-import { setCanTypeOrNot } from "./react-redux/question-generating-slice.js";
+import { setActiveOrNot, setRateHoveredOrNot, setRateSelectedOrNot } from "../react-redux/rate-share-comment-slice.js";
+import { setCanTypeOrNot } from "../react-redux/question-generating-slice.js";
 
 class ImageUploader extends Component {
     constructor(props) {
@@ -19,6 +19,7 @@ class ImageUploader extends Component {
     }
 
     readAndUpdateImg(file) {
+        this.props.submitImageFile(file);
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -37,6 +38,7 @@ class ImageUploader extends Component {
         fileInput.onchange = () => {
             const files = fileInput.files;
             if (files && files[0]) {
+                console.log(files[0]);
                 this.props.submitContainerBorderStyle(true);
                 this.props.submitChangedOrNot(true);
                 this.readAndUpdateImg(files[0]);
@@ -101,7 +103,7 @@ class ImageUploader extends Component {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <img src={require("./images/file_upload.png")} alt="File-upload-icon"
+                                    <img src={require("../images/file_upload.png")} alt="File-upload-icon"
                                         style={{
                                             width: "40%",
                                             height: "auto",
@@ -179,6 +181,11 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(setChangedOrNot({
                 isChanged: isChanged
             }));
+        },
+        submitImageFile: (imgFile) => {
+            dispatch(setImageFile({
+                imgFile: imgFile
+            }))
         },
         submitImageSource: (imgSrc) => {
             dispatch(setImageSource({

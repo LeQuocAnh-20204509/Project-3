@@ -1,7 +1,7 @@
 import { Component } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { connect } from "react-redux";
-import { setAccountFieldHoveredOrNot, setActive, setHoveredOrNot } from "./react-redux/navbar-slice";
+import { setAccountFieldHoveredOrNot, setActive, setHoveredOrNot } from "../react-redux/navbar-slice";
 
 class Navbar extends Component {
 
@@ -142,6 +142,7 @@ class Navbar extends Component {
                             position: "absolute",
                             color: "black",
                             width: "100%",
+                            fontSize: "1.2rem",
                             fontWeight: "450"
                         }}
                     >
@@ -159,9 +160,10 @@ class Navbar extends Component {
                                 padding: "6px 0 3px 0"
                             }}
                         >
-                            Thông tin tài khoản
+                            <i className="fa fa-address-card-o fa-fw" aria-hidden></i>
+                            &nbsp;Thông tin tài khoản
                         </NavLink>
-                        <NavLink to={"/login"} 
+                        <NavLink to={this.props.isUserLoggedIn ? "/logout" : "/login"} 
                             onClick={(event) => {
                                 this.changeActive(3);
                                 this.changeIsNotHovered(3);
@@ -175,7 +177,14 @@ class Navbar extends Component {
                                 padding: "3px 0 6px 0"
                             }}
                         >
-                            Đăng nhập / Đăng ký
+                            {this.props.isUserLoggedIn ?
+                                <>
+                                    <i className="fa fa-sign-out fa-fw" aria-hidden></i> Đăng xuất
+                                </> :
+                                <>
+                                    <i className="fa fa-sign-in fa-fw" aria-hidden></i> Đăng nhập / Đăng ký                                
+                                </> 
+                            }
                         </NavLink>
                     </div>
                 </div>
@@ -186,7 +195,8 @@ class Navbar extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        navbarState: state.navbar
+        navbarState: state.navbar,
+        isUserLoggedIn: state.userAccount.isLoggedIn
     }
 };
 

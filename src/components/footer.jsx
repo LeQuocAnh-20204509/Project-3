@@ -20,7 +20,7 @@ class Footer extends Component {
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "space-around",
-                            gap: "7px",
+                            gap: "8px",
                             color: "GrayText",
                         }}
                     >
@@ -36,7 +36,7 @@ class Footer extends Component {
                                 textDecoration: "none"
                             }}
                         >
-                            <i className="fa fa-facebook" aria-hidden></i>
+                            <i className="fa fa-facebook-official fa-lg" aria-hidden></i>
                             &nbsp;&nbsp;Facebook
                         </a>
                         <a href="https://www.youtube.com/watch?v=boO4QDHnn_w"
@@ -46,7 +46,7 @@ class Footer extends Component {
                                 textDecoration: "none"
                             }}
                         >
-                            <i className="fa fa-youtube" aria-hidden></i>
+                            <i className="fa fa-youtube fa-lg" aria-hidden></i>
                             &nbsp;&nbsp;Youtube
                         </a>
                     </div>

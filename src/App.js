@@ -1,10 +1,12 @@
 import { Component } from "react";
 import "./App.css";
-import ResultContainer from "./result-container";
-import CommentsContainer from "./comments-container";
-import Navbar from "./navbar";
-import Footer from "./footer";
-import Header from "./header";
+import ResultContainer from "./components/result-container";
+import CommentsContainer from "./components/comments-container";
+import Navbar from "./components/navbar";
+import Footer from "./components/footer";
+import Header from "./components/header";
+import Introduction from "./components/introduction";
+import YoutubeEmbeder from "./components/youtube-embeder";
 
 class App extends Component {
   constructor(props) {
@@ -20,10 +22,16 @@ class App extends Component {
         <div id="container">
           <aside></aside>
           <div id="main">
-            <video controls autoPlay>
-              <source type="video/youtube" src="https://www.youtube.com/watch?v=boO4QDHnn_w"/>
-            </video>
-            <ResultContainer />
+            <Introduction />
+            <YoutubeEmbeder youtubeId="boO4QDHnn_w" />
+            <div
+              style={{
+                padding: "0 5%"
+              }}
+            >
+              <h2>Hệ thống</h2>
+              <ResultContainer />
+            </div>
             <CommentsContainer />
           </div>
           <aside></aside>
