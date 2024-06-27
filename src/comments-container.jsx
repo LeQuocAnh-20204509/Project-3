@@ -68,7 +68,7 @@ class CommentsContainer extends Component {
         });
         userComments.push({
             userImg: defaultImage,
-            comment: "Quite good, I like this question."
+            comment: "Quite good, I like this questions."
         });
 
         this.setState({

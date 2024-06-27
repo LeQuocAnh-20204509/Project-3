@@ -3,7 +3,7 @@ import {cookies} from "next/headers";
 export async function PUT(req: Request) {
     console.log(req.headers.get('Authorization'))
     const formData = await req.formData();
-    return await fetch('http://localhost:8000/api/me/change_password', {
+    return await fetch(process.env.BACKEND_API_ENDPOINT+'/api/me/change_password', {
         method: 'PUT',
         body: formData,
         headers: {

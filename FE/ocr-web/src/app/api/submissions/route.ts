@@ -1,19 +1,32 @@
 import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
+import {NextRequest} from "next/server";
 
 export async function POST(req: Request) {
     const c = cookies();
     const authorization = cookies().get('auth_token');
-    c.delete('auth_token');
-
+    console.log(authorization)
     const myHeaders = new Headers();
-    myHeaders.append("Authorization", authorization?.value || '');
+    myHeaders.append("Authorization", `Bearer ${authorization?.value || ''}`);
 
-    await fetch('http://localhost:8000/api/logout', {
-        method: 'GET',
-        headers: myHeaders
+    const res = await fetch(process.env.BACKEND_API_ENDPOINT+'/api/submissions', {
+        method: 'POST',
+        headers: myHeaders,
+        body: await req.formData(),
     });
 
-    redirect('/login');
+    console.dir(await res.json())
+    redirect('/submissions')
+}
 
+export async function GET(req: NextRequest) {
+
+
+    return await fetch(process.env.BACKEND_API_ENDPOINT+'/api/submissions', {
+        method: 'GET',
+        headers: {
+            'Authorization':  req.headers.get("Authorization")??"Bearer "+ cookies().get('auth_token')?.value?? "",
+
+        },
+    });
 }

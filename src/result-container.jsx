@@ -84,7 +84,7 @@ class ResultContainer extends Component {
             setTimeout(() => {
                 var randomIndex = Math.floor(Math.random() * 10);
                 this.props.submitGeneratingOrNot(false);
-                var generatedQuestion = "Example question, this is a random question: The book is: " + "\nA. Toan " + randomIndex 
+                var generatedQuestion = "Example questions, this is a random questions: The book is: " + "\nA. Toan " + randomIndex
                                         + "\nB. Tieng Viet " + randomIndex + "\nC. Tieng Anh " + randomIndex 
                                         + "\nD. Luyen viet " + randomIndex;
                 this.setState({

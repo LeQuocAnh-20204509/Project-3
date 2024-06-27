@@ -8,7 +8,7 @@ export async function GET( req: NextRequest,{ params }: { params: { user_id: str
         console.log('no token')
     }
 
-    return await fetch(`http://localhost:8000/api/users/${params.user_id}/profile-img`, {
+    return await fetch(process.env.BACKEND_API_ENDPOINT+`/api/users/${params.user_id}/profile-img`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,

@@ -14,7 +14,7 @@ const ProfilePage = async () => {
         return <p>Please log in.</p>;
     }
 
-    const data = await (await fetch(process.env.NEXT_PUBLIC_APP_API_ENDPOINT + '/me', {
+    const data =  await (await fetch(process.env.NEXT_PUBLIC_APP_API_ENDPOINT + '/me', {
         method: 'GET',
         headers: {
             "Authorization": "Bearer " + token,

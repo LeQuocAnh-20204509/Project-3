@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
         console.log('no token')
     }
 
-    return await fetch('http://localhost:8000/api/me/profile-img', {
+    return await fetch(process.env.BACKEND_API_ENDPOINT+'/api/me/profile-img', {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get('file');
 
-        const res = await fetch('http://localhost:8000/api/me/profile-img', {
+        const res = await fetch(process.env.BACKEND_API_ENDPOINT+'/api/me/profile-img', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,

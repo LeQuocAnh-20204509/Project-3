@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const myHeaders = new Headers();
     myHeaders.append("Authorization", authorization?.value || '');
 
-    await fetch('http://localhost:8000/api/logout', {
+    await fetch(process.env.BACKEND_API_ENDPOINT+'/api/logout', {
         method: 'GET',
         headers: myHeaders
     });
