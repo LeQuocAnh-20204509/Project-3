@@ -1,7 +1,7 @@
 import { Component } from "react";
-import Navbar from "./navbar.jsx";
-import Footer from "./footer.jsx";
-import Header from "./header.jsx";
+import Navbar from "../components/navbar.jsx";
+import Footer from "../components/footer.jsx";
+import Header from "../components/header.jsx";
 
 class UserProfile extends Component {
     render() {
@@ -9,7 +9,7 @@ class UserProfile extends Component {
             <>
                 <Header />
                 <Navbar />
-                <h2>Trang thông tin tài khoản người dùng</h2>
+                <h1>Trang thông tin tài khoản người dùng</h1>
                 <Footer />
             </>
         )

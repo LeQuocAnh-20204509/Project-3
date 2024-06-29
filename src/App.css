@@ -1,6 +1,6 @@
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 4rem;
+  /* box-sizing: content-box; */
 }
 
 #root {
@@ -12,11 +12,6 @@ html {
 #container {
   display: grid;
   grid-template-columns: 10% 80% 10%;
-}
-
-video {
-  width: 80%;
-  height: 400px;
 }
 
 aside {

@@ -6,6 +6,8 @@ const questionGeneratingSlice = createSlice({
         isGenerating: false,
         canType: false,
         question: [],
+        questionId: "",
+        questionImage: {}
     },
     reducers: {
         setIsGeneratingOrNot: (state, action) => {
@@ -16,9 +18,15 @@ const questionGeneratingSlice = createSlice({
         },
         setQuestion: (state, action) => {
             state.question = action.payload.question;
+        },
+        setQuestionId: (state, action) => {
+            state.questionId = action.payload.questionId;
+        },
+        setQuestionImage: (state, action) => {
+            state.questionImage = action.payload.questionImage;
         }
     }
 })
 
-export const { setCanTypeOrNot, setIsGeneratingOrNot, setQuestion } = questionGeneratingSlice.actions;
+export const { setCanTypeOrNot, setIsGeneratingOrNot, setQuestion, setQuestionId, setQuestionImage } = questionGeneratingSlice.actions;
 export default questionGeneratingSlice.reducer;

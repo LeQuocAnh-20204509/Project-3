@@ -1,9 +1,9 @@
 import { Component } from "react";
-import { setUploadedOrNot, setChangedOrNot, setImageSource, setContainerBorderStyle } from "./react-redux/image-upload-slice.js";
+import { setUploadedOrNot, setChangedOrNot, setImageSource, setContainerBorderStyle, setImageFile } from "../react-redux/image-upload-slice.js";
 import { connect } from "react-redux";
 import axios from "axios";
-import { setActiveOrNot, setRateHoveredOrNot, setRateSelectedOrNot } from "./react-redux/rate-share-comment-slice.js";
-import { setCanTypeOrNot } from "./react-redux/question-generating-slice.js";
+import { setActiveOrNot, setRateHoveredOrNot, setRateSelectedOrNot } from "../react-redux/rate-share-comment-slice.js";
+import { setCanTypeOrNot } from "../react-redux/question-generating-slice.js";
 
 class ImageUploader extends Component {
     constructor(props) {
@@ -19,10 +19,12 @@ class ImageUploader extends Component {
     }
 
     readAndUpdateImg(file) {
+        this.props.submitImageFile(file);
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
             this.props.submitImageSource(event.target.result);
+            console.log(event.target.result);
             this.props.submitUploadedOrNot(true);
             this.props.submitCannotTypeYet();
             this.props.submitFunctionalitesUnactive();
@@ -101,7 +103,7 @@ class ImageUploader extends Component {
                                         justifyContent: "center",
                                     }}
                                 >
-                                    <img src={require("./images/file_upload.png")} alt="File-upload-icon"
+                                    <img src={require("../images/file_upload.png")} alt="File-upload-icon"
                                         style={{
                                             width: "40%",
                                             height: "auto",
@@ -179,6 +181,11 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(setChangedOrNot({
                 isChanged: isChanged
             }));
+        },
+        submitImageFile: (imgFile) => {
+            dispatch(setImageFile({
+                imgFile: imgFile
+            }))
         },
         submitImageSource: (imgSrc) => {
             dispatch(setImageSource({

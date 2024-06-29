@@ -1,6 +1,7 @@
 import { Component } from "react";
-import { setRateHoveredOrNot, setRateSelectedOrNot } from "./react-redux/rate-share-comment-slice";
+import { setRateHoveredOrNot, setRateSelectedOrNot } from "../react-redux/rate-share-comment-slice";
 import { connect } from "react-redux";
+import axios from "axios";
 
 const RatingStar = function(props) {
     function mouseEnterHandler(event) {
@@ -68,6 +69,39 @@ class RatingStarsContainer extends Component {
         } else {
             this.props.submitRateSelectedOrNot(index, true);
             this.changeToActive(index);
+            var data = {
+                review: "",
+                rating: index + 1
+            };
+            var jsonData = JSON.stringify(data);
+            var config = {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("authToken")
+                }
+            }
+            axios.post("http://localhost:8000/api/questions/" + this.props.questionId + "/rating",
+                jsonData,
+                config
+            ).then((response) => {
+                console.log(response);
+                alert("Cảm ơn bạn, đánh giá của bạn đã được gửi!");
+            }).catch((error) => {
+                console.log(error);
+                if (error.response) {
+                    switch (error.response.status) {
+                        case 400: console.log("Bad request!"); break;
+                        case 403: alert("Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại!");
+                                break;
+                        case 500: alert("Server đang gặp lỗi, bạn vui lòng thử lại sau!");
+                                break;
+                        default: alert("Đã có lỗi xảy ra trong quá trình gửi đánh giá của bạn, xin vui lòng thử lại!");
+                    }
+                } else if (error.request) {
+                    alert("Server không phản hồi!");
+                };
+                this.props.submitRateSelectedOrNot(0, false);
+                this.changeToUnactive(0);
+            })
         }
     }
 
@@ -103,7 +137,8 @@ const mapStateToProps = (state) => {
         isHovered: state.rateShareComment.rate.isHovered,
         isSelected: state.rateShareComment.rate.isSelected,
         isImageUploaded: state.imageUpload.isUploaded,
-        isFunctionalitiesActive: state.rateShareComment.isActive
+        questionId: state.questionGenerating.questionId,
+        isFunctionalitiesActive: state.rateShareComment.isActive,
     }
 }
 

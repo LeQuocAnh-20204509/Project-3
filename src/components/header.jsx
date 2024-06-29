@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { NavLink } from "react-router-dom";
-import { setActive } from "./react-redux/navbar-slice";
+import { setActive } from "../react-redux/navbar-slice";
 import { connect } from "react-redux";
 
 class Header extends Component {
@@ -19,7 +19,7 @@ class Header extends Component {
                 <header
                     onClick={this.changeActive}
                     style={{
-                        // height: "100px",
+                        height: "100px",
                         width: "100%",
                         padding: "30px 0",
                         fontSize: "2rem",
@@ -35,7 +35,7 @@ class Header extends Component {
                             justifyContent: "center",
                         }}
                     >
-                        <img src={require('./images/ocr-image.png')} alt="ocr-image"
+                        <img src={require('../images/ocr-image.png')} alt="ocr-image"
                             style={{
                                 width: "2.5rem"
                             }}

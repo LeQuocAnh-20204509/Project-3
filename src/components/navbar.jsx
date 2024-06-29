@@ -1,7 +1,9 @@
 import { Component } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { setAccountFieldHoveredOrNot, setActive, setHoveredOrNot } from "./react-redux/navbar-slice";
+import { setAccountFieldHoveredOrNot, setActive, setHoveredOrNot } from "../react-redux/navbar-slice";
+import { setLoginOrNot } from "../react-redux/user-account-slice";
+import axios from "axios";
 
 class Navbar extends Component {
 
@@ -15,6 +17,7 @@ class Navbar extends Component {
         this.changeIsNotHovered = this.changeIsNotHovered.bind(this);
         this.changeItemDropdownBgColor = this.changeItemDropdownBgColor.bind(this);
         this.changeBackItemDropdownBgColor = this.changeBackItemDropdownBgColor.bind(this);
+        this.handleLogOutClick = this.handleLogOutClick.bind(this);
     }
 
     changeActive(index) {
@@ -35,6 +38,39 @@ class Navbar extends Component {
 
     changeBackItemDropdownBgColor(index) {
         this.props.submitAccountFieldHoveredOrNot(index, false);
+    }
+
+    handleLogOutClick() {
+        var confirmLogOut = window.confirm("Bạn có chắc chắn muốn đăng xuất ra khỏi hệ thống không?"
+            + "\nNếu đăng xuất bạn sẽ không thể tiếp tục sử dụng hệ thống được nữa!");
+        if (confirmLogOut) {
+            var config = {
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("authToken")
+                }
+            }
+            axios.get("http://localhost:8000/api/logout",
+                config
+            ).then((response) => {
+                this.props.submitUserLogOut();
+                localStorage.removeItem("username");
+                localStorage.removeItem("authToken");
+                window.location.href = "http://localhost:3000";
+            }).catch((error) => {
+                console.log(error);
+                if (error.response) {
+                    switch (error.response.status) {
+                        case 500: alert("Server gặp lỗi trong quá trình đăng xuất cho bạn, xin vui lòng thử lại!");
+                                    break;
+                        default: alert("Đã có lỗi xảy ra trong quá trình đăng xuất cho bạn, xin vui lòng thử lại!")
+                    }
+                } else if (error.request) {
+                    alert("Server không phản hồi!");
+                }
+            })
+            
+        }
+        // window.location.href
     }
 
     render() {
@@ -142,6 +178,7 @@ class Navbar extends Component {
                             position: "absolute",
                             color: "black",
                             width: "100%",
+                            fontSize: "1.2rem",
                             fontWeight: "450"
                         }}
                     >
@@ -159,24 +196,42 @@ class Navbar extends Component {
                                 padding: "6px 0 3px 0"
                             }}
                         >
-                            Thông tin tài khoản
+                            <i className="fa fa-address-card-o fa-fw" aria-hidden></i>
+                            &nbsp;Thông tin tài khoản
                         </NavLink>
-                        <NavLink to={"/login"} 
-                            onClick={(event) => {
-                                this.changeActive(3);
-                                this.changeIsNotHovered(3);
-                                this.changeBackItemDropdownBgColor(1);
-                            }}
-                            onMouseEnter={(event) => this.changeItemDropdownBgColor(1)} 
-                            onMouseLeave={(event) => this.changeBackItemDropdownBgColor(1)}
-                            style={{
-                                display: "block",
-                                backgroundColor: this.props.navbarState.accountFieldHovered[1] ? "#ffdac0" : "#f1f1f1",
-                                padding: "3px 0 6px 0"
-                            }}
-                        >
-                            Đăng nhập / Đăng ký
-                        </NavLink>
+                        {
+                            this.props.isUserLoggedIn ?
+                            <div
+                                onMouseEnter={(event) => this.changeItemDropdownBgColor(1)} 
+                                onMouseLeave={(event) => this.changeBackItemDropdownBgColor(1)}
+                                onClick={this.handleLogOutClick}
+                                style={{
+                                    display: "block",
+                                    backgroundColor: this.props.navbarState.accountFieldHovered[1] ? "#ffdac0" : "#f1f1f1",
+                                    padding: "3px 0 6px 0"
+                                }}
+                            >
+                                <i className="fa fa-sign-out fa-fw" aria-hidden></i>
+                                &nbsp;Đăng xuất
+                            </div> :
+                            <NavLink to={"/login"} 
+                                onClick={(event) => {
+                                    this.changeActive(3);
+                                    this.changeIsNotHovered(3);
+                                    this.changeBackItemDropdownBgColor(1);
+                                }}
+                                onMouseEnter={(event) => this.changeItemDropdownBgColor(1)} 
+                                onMouseLeave={(event) => this.changeBackItemDropdownBgColor(1)}
+                                style={{
+                                    display: "block",
+                                    backgroundColor: this.props.navbarState.accountFieldHovered[1] ? "#ffdac0" : "#f1f1f1",
+                                    padding: "3px 0 6px 0"
+                                }}
+                            >
+                                <i className="fa fa-sign-in fa-fw" aria-hidden></i> Đăng nhập / Đăng ký
+                            </NavLink>
+                        }
+                        
                     </div>
                 </div>
             </div>
@@ -186,7 +241,8 @@ class Navbar extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        navbarState: state.navbar
+        navbarState: state.navbar,
+        isUserLoggedIn: state.userAccount.isLoggedIn
     }
 };
 
@@ -207,6 +263,11 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(setAccountFieldHoveredOrNot({
                 index: index,
                 isHovered: isHovered
+            }))
+        },
+        submitUserLogOut: () => {
+            dispatch(setLoginOrNot({
+                isLoggedIn: false
             }))
         }
     }
