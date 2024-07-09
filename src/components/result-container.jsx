@@ -93,7 +93,7 @@ class ResultContainer extends Component {
             var data = new FormData();
             var config = {
                 headers: {
-                    Authorization: "Bearer " + localStorage.getItem("authToken")
+                    Authorization: "Bearer " + sessionStorage.getItem("authToken")
                 }
             }
             data.append("files", this.props.imgFile);
@@ -486,6 +486,7 @@ class ResultContainer extends Component {
                     <div
                         style={{
                             padding: "5%",
+                            paddingBottom: "0",
                             fontSize: "1.rem",
                             color: this.props.isFunctionalitiesActive ? "black" : "GrayText"
                         }}
@@ -597,6 +598,16 @@ class ResultContainer extends Component {
                             <i className="fa fa-download fa-lg fa-fw" aria-hidden></i>
                             &nbsp;Tải xuống câu hỏi
                         </button>
+
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <i
+                            style={{
+                                fontSize: "0.9rem"
+                            }}
+                        >{"*Bạn có thể xem các câu hỏi đã sinh trong trang Thông tin tài khoản"}</i>
                     </div>
                 </div>
             </div>

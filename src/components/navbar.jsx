@@ -46,15 +46,15 @@ class Navbar extends Component {
         if (confirmLogOut) {
             var config = {
                 headers: {
-                    Authorization: "Bearer " + localStorage.getItem("authToken")
+                    Authorization: "Bearer " + sessionStorage.getItem("authToken")
                 }
             }
             axios.get("http://localhost:8000/api/logout",
                 config
             ).then((response) => {
                 this.props.submitUserLogOut();
-                localStorage.removeItem("username");
-                localStorage.removeItem("authToken");
+                sessionStorage.removeItem("username");
+                sessionStorage.removeItem("authToken");
                 window.location.href = "http://localhost:3000";
             }).catch((error) => {
                 console.log(error);
@@ -70,7 +70,6 @@ class Navbar extends Component {
             })
             
         }
-        // window.location.href
     }
 
     render() {

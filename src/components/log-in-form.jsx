@@ -1,24 +1,46 @@
-'use client'
-
-// import {logIn} from '@/app/lib/actions'
-import {useFormState, useFormStatus} from 'react-dom'
-import {Button} from "./ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "./ui/card"
-import {Input} from "./ui/input"
-import {Label} from "./ui/label"
 import { Component } from 'react'
-// import Link from "next/link";
-import "../global.css"
 import axios from 'axios'
 import { setLoginOrNot } from '../react-redux/user-account-slice'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
+
+class LogInButton extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isHovered: false
+        }
+        this.handleButtonHoveredOrNot = this.handleButtonHoveredOrNot.bind(this);
+    }
+
+    handleButtonHoveredOrNot(isHovered) {
+        this.setState({
+            isHovered: isHovered
+        })
+    }
+
+    render() {
+        return (
+            <button
+                onMouseEnter={(event) => this.handleButtonHoveredOrNot(true)}
+                onMouseLeave={(event) => this.handleButtonHoveredOrNot(false)}
+                onClick={(event) => this.props.onClickHandler()}
+                style={{
+                    width: "100%",
+                    margin: "5% 0",
+                    padding: "5%",
+                    fontSize: "1.1rem",
+                    border: "none",
+                    cursor: "pointer",
+                    backgroundColor: this.state.isHovered ? "#1974D3" : "ButtonFace",
+                    color: this.state.isHovered ? "white" : "black"
+                }}
+            >
+                Đăng nhập
+            </button>
+        )
+    }
+}
 
 class LogInForm extends Component {
     constructor(props) {
@@ -38,7 +60,7 @@ class LogInForm extends Component {
         var usernameError = "";
         
         if (username === "") {
-            usernameError = "Tên đăng nhập không được phép bỏ trống";
+            usernameError = "Tên người dùng không được phép bỏ trống";
         } else {
             usernameError = "";
         }
@@ -82,7 +104,7 @@ class LogInForm extends Component {
 
         var newErrorMessages = [...this.state.errorMessages];
         if (usernameInput.value === "") {
-            newErrorMessages[0] = "Tên đăng nhập không được phép bỏ trống";
+            newErrorMessages[0] = "Tên người dùng không được phép bỏ trống";
         }
         if (passwordInput.value === "") {
             newErrorMessages[1] = "Mật khẩu không được phép bỏ trống";
@@ -96,6 +118,10 @@ class LogInForm extends Component {
             } else if (this.state.errorMessages[1]) {
                 passwordInput.focus();
             } else {
+                newErrorMessages[2] = "";
+                this.setState({
+                    errorMessages: newErrorMessages
+                })
                 var body = new FormData();
                 body.append("username", usernameInput.value);
                 body.append("password", passwordInput.value);
@@ -104,12 +130,25 @@ class LogInForm extends Component {
                 ).then((response) => {
                     console.log(response);
                     this.props.submitUserLoggedIn();
-                    localStorage.setItem("username", usernameInput.value);
-                    localStorage.setItem("authToken", response.data.auth_token);
-                    // alert("Đăng nhập thành công!"
-                    //     + "\nBạn sẽ được điều hướng đến Trang chủ của hệ thống."
-                    // );
-    
+                    sessionStorage.setItem("username", usernameInput.value);
+                    sessionStorage.setItem("authToken", response.data.auth_token);
+                    
+                    var config = {
+                        headers: {
+                            Authorization: "Bearer " + sessionStorage.getItem("authToken")
+                        }
+                    }
+                    axios.get("http://localhost:8000/api/me/profile-img",
+                        config
+                    ).then((response2) => {
+                        console.log(response2)
+                        if (response2.data.image) {
+                            sessionStorage.setItem("userImage", response2.data.image);
+                        }
+                    }).catch((error2) => {
+                        console.log(error2);
+                        alert("Đã có lỗi xảy ra trong việc truy xuất ảnh đại diện tài khoản của bạn từ server!");
+                    })
                 }).catch((error) => {
                     console.log(error);
                     var newErrorMessages = [...this.state.errorMessages];
@@ -120,9 +159,9 @@ class LogInForm extends Component {
                                 var startIndex = errMessage.indexOf("in") + 3;
                                 var endIndex = errMessage.indexOf("seconds") - 1;
                                 var timeToWait = Number(errMessage.substring(startIndex, endIndex));
-                                alert("Bạn đã đăng nhập quá nhiều lần, vui lòng thử lại trong " + timeToWait + " giây nữa!");
+                                alert("Bạn đã thử đăng nhập quá nhiều lần, vui lòng thử lại trong " + timeToWait + " giây nữa!");
                             } else if (error.response.data.message === "Invalid email or password") {
-                                newErrorMessages[2] = "Tên đăng nhập hoặc mật khẩu không đúng";
+                                newErrorMessages[2] = "Tên người dùng hoặc mật khẩu không đúng";
                                 this.setState({
                                     errorMessages: newErrorMessages
                                 })
@@ -163,96 +202,174 @@ class LogInForm extends Component {
         return (
             this.props.isUserLoggedIn ?
             resultDiv :
-            <Card className="mx-auto max-w-sm">
-                <CardHeader>
-                    <CardTitle className="text-2xl">Login</CardTitle>
-                    <CardDescription>
-                        Enter your username below to login to your account
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="username">Username</Label>
-                            <Input
-                                id="username"
-                                onChange={this.handleUsernameInputChange}
-                                name={'username'}
-                                type="text"
-                                required
-                            />
-                            {
-                                (this.state.errorMessages[0] === "") ?
-                                "" :
-                                <div
-                                    style={{
-                                        color: "red",
-                                        fontSize: "0.7rem",
-                                        fontStyle: "italic"
-                                    }}
-                                >
-                                    {this.state.errorMessages[0]}
-                                </div>
-                            }
-                        </div>
-                        <div className="grid gap-2">
-                            <div className="flex items-center">
-                                <Label htmlFor="password">Password</Label>
-                                <a href="#" className="ml-auto inline-block text-sm underline">
-                                    Forgot your password?
-                                </a>
-                            </div>
-                            <Input id="password" type="password" required name={'password'}
-                                onChange={this.handlePasswordInputChange}
-                            />
-                            {
-                                (this.state.errorMessages[1] === "") ?
-                                "" :
-                                <div
-                                    style={{
-                                        color: "red",
-                                        fontSize: "0.7rem",
-                                        fontStyle: "italic"
-                                    }}
-                                >
-                                    {this.state.errorMessages[1]}
-                                </div>
-                            }
-                        </div>
-                        {
-                            (this.state.errorMessages[2] === "") ?
-                            "" :
-                            <div
-                                style={{
-                                    color: "red",
-                                    fontSize: "0.7rem",
-                                    fontStyle: "italic"
-                                }}
-                            >
-                                {this.state.errorMessages[2]}
-                            </div>
-                        }
-                        <Button
-                            onClick={this.handleLoginButtonClick}
-                            className="w-full"
-                        >
-                            Login
-                        </Button>
-                    </div>
-
-                    <div className="mt-4 text-center text-sm">
-                        Don&apos;t have an account?{" "}
-                        <NavLink
-                            to={"/signup"}
+            <>
+            <div
+                style={{
+                    width: "25vw",
+                    margin: "0 auto",
+                    padding: "0 5% 2%",
+                    boxShadow: "2px 0 2px rgba(0, 0, 0, 0.19), -2px 0 2px rgba(0, 0, 0, 0.19)"
+                }}
+            >
+                <h1>Đăng nhập</h1>
+                <div>
+                    Vui lòng điền tên người dùng và mật khẩu bên dưới để đăng nhập
+                </div>
+                <br/>
+                <div>
+                    <label
+                        style={{
+                            fontSize: "1.2rem",
+                            fontWeight: "600"
+                        }}
+                    >
+                        Tên người dùng
+                    </label>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <i className='fa fa-user-o' aria-hidden
                             style={{
-                                textDecoration: "underline"
+                                height: "25px",
+                                fontSize: "1.2rem",
+                                padding: "3%",
+                                border: "1px solid black",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px"
+                            }}
+                        ></i>
+                        <input type='text' id="username" required
+                            onChange={this.handleUsernameInputChange}
+                            style={{
+                                width: "94%",
+                                height: "25px",
+                                padding: "3%",
+                                margin: "3% 0",
+                                fontSize: "1.2rem",
+                                borderTopRightRadius: "5px",
+                                borderBottomRightRadius: "5px",
+                                borderStyle: "solid",
+                                borderWidth: "1px"
+                            }}
+                        />
+                    </div>
+                    {
+                        (this.state.errorMessages[0] === "") ?
+                        "" :
+                        <div
+                            style={{
+                                color: "red",
+                                fontSize: "0.7rem",
+                                fontStyle: "italic",
+                                marginBottom: "3%"
                             }}
                         >
-                            Sign up
-                        </NavLink>
+                            {this.state.errorMessages[0]}
+                        </div>
+                    }
+                </div>
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <label
+                            style={{
+                                fontSize: "1.2rem",
+                                fontWeight: "600"
+                            }}
+                        >
+                            Mật khẩu
+                        </label>
+                        <a href=""
+                            style={{
+                                fontSize: "1rem",
+                                fontStyle: "italic",
+                                textDecoration: "underline"
+                            }}
+                        >Quên mật khẩu</a>
                     </div>
-                </CardContent>
-            </Card>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center"
+                        }}
+                    >
+                        <i className='fa fa-key' aria-hidden
+                            style={{
+                                height: "25px",
+                                fontSize: "1.2rem",
+                                padding: "3%",
+                                border: "1px solid black",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px"
+                            }}
+                        ></i>
+                        <input type='password' id="password" required
+                            onChange={this.handlePasswordInputChange}
+                            style={{
+                                    width: "94%",
+                                    height: "25px",
+                                    padding: "3%",
+                                    margin: "3% 0",
+                                    fontSize: "1.2rem",
+                                    borderTopRightRadius: "5px",
+                                    borderBottomRightRadius: "5px",
+                                    borderStyle: "solid",
+                                    borderWidth: "1px"
+                                }}
+                        />
+                    </div>
+                    {
+                        (this.state.errorMessages[1] === "") ?
+                        "" :
+                        <div
+                            style={{
+                                color: "red",
+                                fontSize: "0.7rem",
+                                fontStyle: "italic",
+                                marginBottom: "2%"
+                            }}
+                        >
+                            {this.state.errorMessages[1]}
+                        </div>
+                    }
+                </div>
+                {
+                    (this.state.errorMessages[2] === "") ?
+                    "" :
+                    <div
+                        style={{
+                            color: "red",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            margin: "3% 0 2%"
+                        }}
+                    >
+                        {this.state.errorMessages[2]}
+                    </div>
+                }
+                <LogInButton onClickHandler={this.handleLoginButtonClick} />
+                <div
+                    style={{
+                        marginTop: "2%"
+                    }}
+                >
+                    Chưa có tài khoản?&nbsp;
+                    <NavLink to={"/signup"}
+                        style={{
+                            fontStyle: "italic",
+                            textDecoration: "underline"
+                        }}
+                    >Đăng ký ngay</NavLink>
+                </div>
+            </div>
+            </>
         )
     }
 }

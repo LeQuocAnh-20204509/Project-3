@@ -55,7 +55,7 @@ class CommentsContainer extends Component {
         var newComments = [...this.state.comments];
         newComments.push({
             userImg: this.props.userImg,
-            name: localStorage.getItem("username"),
+            name: sessionStorage.getItem("username"),
             comment: userComment
         });
         this.setState({

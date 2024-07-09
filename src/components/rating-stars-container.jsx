@@ -76,7 +76,7 @@ class RatingStarsContainer extends Component {
             var jsonData = JSON.stringify(data);
             var config = {
                 headers: {
-                    Authorization: "Bearer " + localStorage.getItem("authToken")
+                    Authorization: "Bearer " + sessionStorage.getItem("authToken")
                 }
             }
             axios.post("http://localhost:8000/api/questions/" + this.props.questionId + "/rating",

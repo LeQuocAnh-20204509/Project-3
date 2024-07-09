@@ -7,9 +7,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LogInPage from './pages/log-in-page';
 import { Provider } from "react-redux";
 import store from "./react-redux/redux-store";
-import UserProfile from './pages/user-profile';
+import UserProfilePage from './pages/user-profile-page';
 import SharePage from './pages/share-page';
 import SignUpPage from './pages/sign-up-page';
+import GeneratedQuestionPage from './pages/generated-question-page';
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/user-profile",
-    Component: UserProfile
+    Component: UserProfilePage,
+  },
+  {
+    path: "/user-profile/generated-question/:id",
+    Component: GeneratedQuestionPage
   },
   {
     path: "/share",

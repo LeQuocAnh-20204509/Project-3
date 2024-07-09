@@ -1,19 +1,44 @@
-"use client"
-
-import { NavLink } from "react-router-dom"
-import {Button} from "./ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "./ui/card"
-import {Input} from "./ui/input"
-import {Label} from "./ui/label"
 import { Component } from "react"
 import axios from "axios"
-import "../global.css"
+import { NavLink } from "react-router-dom"
+
+class SignUpButton extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isHovered: false
+        }
+        this.handleButtonHoveredOrNot = this.handleButtonHoveredOrNot.bind(this);
+    }
+
+    handleButtonHoveredOrNot(isHovered) {
+        this.setState({
+            isHovered: isHovered
+        })
+    }
+
+    render() {
+        return (
+            <button
+                onMouseEnter={(event) => this.handleButtonHoveredOrNot(true)}
+                onMouseLeave={(event) => this.handleButtonHoveredOrNot(false)}
+                onClick={(event) => this.props.onClickHandler()}
+                style={{
+                    width: "100%",
+                    margin: "5% 0",
+                    padding: "5%",
+                    fontSize: "1.1rem",
+                    border: "none",
+                    cursor: "pointer",
+                    backgroundColor: this.state.isHovered ? "#1974D3" : "ButtonFace",
+                    color: this.state.isHovered ? "white" : "black"
+                }}
+            >
+                Đăng ký
+            </button>
+        )
+    }
+}
 
 class SignUpForm extends Component {
     constructor(props) {
@@ -56,7 +81,7 @@ class SignUpForm extends Component {
         var usernameError = "";
         
         if (username === "") {
-            usernameError = "Tên đăng nhập không được để trống";
+            usernameError = "Tên người dùng không được để trống";
         } else {
             usernameError = "";
         }
@@ -104,7 +129,7 @@ class SignUpForm extends Component {
             newErrorMessages[0] = "Email không được để trống";
         }
         if (usernameInput.value === "") {
-            newErrorMessages[1] = "Tên đăng nhập không được để trống";
+            newErrorMessages[1] = "Tên người dùng không được để trống";
         }
         if (passwordInput.value === "") {
             newErrorMessages[2] = "Mật khẩu không được để trống";
@@ -120,6 +145,10 @@ class SignUpForm extends Component {
             } else if (this.state.errorMessages[2]) {
                 passwordInput.focus();
             } else {
+                newErrorMessages[3] = "";
+                this.setState({
+                    errorMessages: newErrorMessages
+                })
                 var data = {
                     email: emailInput.value,
                     username: usernameInput.value,
@@ -143,7 +172,7 @@ class SignUpForm extends Component {
                             if (error.response.data.message === "Email already exists") {
                                 newErrorMessages[3] = "Email đã được đăng ký bởi tài khoản khác trong hệ thống";
                             } else if (error.response.data.Exception.includes("Duplicate entry")) {
-                                newErrorMessages[3] = "Tên đăng nhập " + usernameInput.value + " đã tồn tại trong hệ thống";
+                                newErrorMessages[3] = "Tên người dùng " + usernameInput.value + " đã tồn tại trong hệ thống";
                             } else if (error.response.data.Exception.includes("Request was throttled.")) {
                                 var errMessage = error.response.data.Exception;
                                 var startIndex = errMessage.indexOf("in") + 3;
@@ -174,111 +203,220 @@ class SignUpForm extends Component {
 
     render() {
         return (
-            // <form>
-                <Card className="mx-auto max-w-sm">
-                    <CardHeader>
-                        <CardTitle className="text-xl">Sign Up</CardTitle>
-                        <CardDescription>
-                            Enter your information to create an account
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    onChange={this.handleEmailInputChange}
-                                    id="email"
-                                    type="email"
-                                    placeholder="m@example.com"
-                                    required
-                                    name="email"
-                                />
-                                {
-                                    (this.state.errorMessages[0] === "") ?
-                                    "" :
-                                    <div
-                                        style={{
-                                            color: "red",
-                                            fontSize: "0.7rem",
-                                            fontStyle: "italic"
-                                        }}
-                                    >
-                                        {this.state.errorMessages[0]}
-                                    </div>
-                                }
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input id="username" type="username" name="username" required
-                                    onChange={this.handleUsernameInputChange}
-                                />
-                                {
-                                    (this.state.errorMessages[1] === "") ?
-                                    "" :
-                                    <div
-                                        style={{
-                                            color: "red",
-                                            fontSize: "0.7rem",
-                                            fontStyle: "italic"
-                                        }}
-                                    >
-                                        {this.state.errorMessages[1]}
-                                    </div>
-                                }
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <Input id="password" type="password" name="password" required
-                                    onChange={this.handlePasswordInputChange}
-                                />
-                                {
-                                    (this.state.errorMessages[2] === "") ?
-                                    "" :
-                                    <div
-                                        style={{
-                                            color: "red",
-                                            fontSize: "0.7rem",
-                                            fontStyle: "italic"
-                                        }}
-                                    >
-                                        {this.state.errorMessages[2]}
-                                    </div>
-                                }
-                            </div>
-
-                            {
-                                (this.state.errorMessages[3] === "") ?
-                                "" :
-                                <div
-                                    style={{
-                                        color: "red",
-                                        fontSize: "0.7rem",
-                                        fontStyle: "italic"
-                                    }}
-                                >
-                                    {this.state.errorMessages[3]}
-                                </div>
-                            }
-                            
-                            <Button onClick={this.handleSignUpButtonClick}
-                                className="w-full"
-                            >
-                                Create an account
-                            </Button>
+            <div
+                style={{
+                    width: "25vw",
+                    margin: "0 auto",
+                    padding: "0 5% 2%",
+                    boxShadow: "2px 0 2px rgba(0, 0, 0, 0.19), -2px 0 2px rgba(0, 0, 0, 0.19)"
+                }}
+            >
+                <h1>Đăng ký</h1>
+                <div>
+                    Vui lòng điền đầy đủ thông tin bên dưới để đăng ký tài khoản
+                </div>
+                <br/>
+                <div>
+                    <label
+                        style={{
+                            fontSize: "1.2rem",
+                            fontWeight: "600"
+                        }}
+                    >
+                        Email
+                    </label>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <i className='fa fa-envelope-o' aria-hidden
+                            style={{
+                                height: "25px",
+                                fontSize: "1.2rem",
+                                padding: "3%",
+                                border: "1px solid black",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px"
+                            }}
+                        ></i>
+                        <input type='email' id="email" required placeholder="a@example.com"
+                            onChange={this.handleEmailInputChange}
+                            style={{
+                                width: "94%",
+                                height: "25px",
+                                padding: "3%",
+                                margin: "3% 0",
+                                fontSize: "1.2rem",
+                                borderTopRightRadius: "5px",
+                                borderBottomRightRadius: "5px",
+                                borderStyle: "solid",
+                                borderWidth: "1px"
+                            }}
+                        />
+                    </div>
+                    {
+                        (this.state.errorMessages[0] === "") ?
+                        "" :
+                        <div
+                            style={{
+                                color: "red",
+                                fontSize: "0.7rem",
+                                fontStyle: "italic",
+                                marginBottom: "3%"
+                            }}
+                        >
+                            {this.state.errorMessages[0]}
                         </div>
-                        <div className="mt-4 text-center text-sm">
-                            Already have an account?{" "}
-                            <NavLink 
-                                to={"/login"}
-                                className="underline"
-                            >
-                                Sign in
-                            </NavLink>
+                    }
+                </div>
+                <div>
+                    <label
+                        style={{
+                            fontSize: "1.2rem",
+                            fontWeight: "600"
+                        }}
+                    >
+                        Tên người dùng
+                    </label>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                        }}
+                    >
+                        <i className='fa fa-user-o' aria-hidden
+                            style={{
+                                height: "25px",
+                                fontSize: "1.2rem",
+                                padding: "3%",
+                                border: "1px solid black",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px"
+                            }}
+                        ></i>
+                        <input type='text' id="username" required placeholder="username"
+                            onChange={this.handleUsernameInputChange}
+                            style={{
+                                width: "94%",
+                                height: "25px",
+                                padding: "3%",
+                                margin: "3% 0",
+                                fontSize: "1.2rem",
+                                borderTopRightRadius: "5px",
+                                borderBottomRightRadius: "5px",
+                                borderStyle: "solid",
+                                borderWidth: "1px"
+                            }}
+                        />
+                    </div>
+                    {
+                        (this.state.errorMessages[1] === "") ?
+                        "" :
+                        <div
+                            style={{
+                                color: "red",
+                                fontSize: "0.7rem",
+                                fontStyle: "italic",
+                                marginBottom: "3%"
+                            }}
+                        >
+                            {this.state.errorMessages[1]}
                         </div>
-                    </CardContent>
-                </Card>
-            // </form>
+                    }
+                </div>
+                <div>
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <label
+                            style={{
+                                fontSize: "1.2rem",
+                                fontWeight: "600"
+                            }}
+                        >
+                            Mật khẩu
+                        </label>
+                    </div>
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center"
+                        }}
+                    >
+                        <i className='fa fa-key' aria-hidden
+                            style={{
+                                height: "25px",
+                                fontSize: "1.2rem",
+                                padding: "3%",
+                                border: "1px solid black",
+                                borderTopLeftRadius: "5px",
+                                borderBottomLeftRadius: "5px"
+                            }}
+                        ></i>
+                        <input type='password' id="password" required placeholder="password"
+                            onChange={this.handlePasswordInputChange}
+                            style={{
+                                    width: "94%",
+                                    height: "25px",
+                                    padding: "3%",
+                                    margin: "3% 0",
+                                    fontSize: "1.2rem",
+                                    borderTopRightRadius: "5px",
+                                    borderBottomRightRadius: "5px",
+                                    borderStyle: "solid",
+                                    borderWidth: "1px"
+                                }}
+                        />
+                    </div>
+                    {
+                        (this.state.errorMessages[2] === "") ?
+                        "" :
+                        <div
+                            style={{
+                                color: "red",
+                                fontSize: "0.7rem",
+                                fontStyle: "italic",
+                                marginBottom: "2%"
+                            }}
+                        >
+                            {this.state.errorMessages[2]}
+                        </div>
+                    }
+                </div>
+                {
+                    (this.state.errorMessages[3] === "") ?
+                    "" :
+                    <div
+                        style={{
+                            color: "red",
+                            fontSize: "0.7rem",
+                            fontStyle: "italic",
+                            margin: "3% 0 2%"
+                        }}
+                    >
+                        {this.state.errorMessages[3]}
+                    </div>
+                }
+                <SignUpButton onClickHandler={this.handleSignUpButtonClick} />
+                <div
+                    style={{
+                        marginTop: "2%"
+                    }}
+                >
+                    Đã có tài khoản?&nbsp;
+                    <NavLink to={"/login"}
+                        style={{
+                            fontStyle: "italic",
+                            textDecoration: "underline"
+                        }}
+                    >Đăng nhập</NavLink>
+                </div>
+            </div>
         )
     }
 }
